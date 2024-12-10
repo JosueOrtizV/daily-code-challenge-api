@@ -15,6 +15,7 @@ const app = express();
 
 // Ruta al archivo de credenciales
 const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+console.log(credentialsPath);
 
 if (!credentialsPath) {
     throw new Error('La variable de entorno GOOGLE_APPLICATION_CREDENTIALS no está definida.');
