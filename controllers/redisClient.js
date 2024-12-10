@@ -11,12 +11,13 @@ const client = createClient({
     password: process.env.REDIS_PASSWORD,
     socket: {
         host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT
+        port: process.env.REDIS_PORT,
+        connectTimeout: 10000
     }
 });
 
 client.on('error', err => console.log('Redis Client Error', err));
 
-client.connect().catch(err => console.log('Redis Client Connection Error', err));
+client.connect(console.log('Conected to redis')).catch(err => console.log('Redis Client Connection Error', err));
 
 module.exports = client;
