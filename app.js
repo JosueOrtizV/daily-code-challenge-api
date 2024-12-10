@@ -9,10 +9,18 @@ const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const firebaseAdmin = require('firebase-admin');
 const fs = require('fs');
+const path = require('path');
 
 const app = express();
 
-const serviceAccount = JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, 'utf8'));
+// Ruta al archivo de credenciales
+const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+
+if (!credentialsPath) {
+    throw new Error('La variable de entorno GOOGLE_APPLICATION_CREDENTIALS no está definida.');
+}
+
+const serviceAccount = JSON.parse(fs.readFileSync(path.resolve(credentialsPath), 'utf8'));
 
 // Inicializar Firebase Admin SDK
 firebaseAdmin.initializeApp({
