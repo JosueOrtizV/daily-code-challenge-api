@@ -11,7 +11,6 @@ const firebaseAdmin = require('firebase-admin');
 
 const app = express();
 
-// Leer las credenciales desde la variable de entorno
 const serviceAccount = JSON.parse(process.env.FIREBASE_CREDENTIALS);
 
 // Inicializar Firebase Admin SDK

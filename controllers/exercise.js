@@ -3,10 +3,9 @@
 const model = require('../models/excercisepool');
 require('./scoreReset');
 require('./archiveOldExercises');
-const fs = require('fs');
-const path = require('path');
 const cron = require('node-cron');
 const Exercise = require('../models/exercise');
+const client = require('./redisClient');
 
 const MAX_RETRIES = 5;
 const RETRY_INTERVAL = 60000;
@@ -14,7 +13,7 @@ const RETRY_INTERVAL = 60000;
 cron.schedule('0 0 * * *', async () => {
     try {
         await controller.getDailyChallenge();
-        console.log('Daily challenge retrieved and stored in the database.');
+        console.log('Daily challenge retrieved and stored in Redis.');
     } catch (error) {
         console.error('Error retrieving daily challenge:', error);
     }
@@ -124,7 +123,7 @@ const controller = {
     },
 
     getDailyChallenge: async (req, res) => {
-        const localPath = path.join(__dirname, '../local/exercise_of_the_day.json');
+        const redisKey = 'exercise_of_the_day';
 
         try {
             const today = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" }));
@@ -134,14 +133,14 @@ const controller = {
 
             let challenge = null;
 
-            // Try reading from local storage first
-            if (fs.existsSync(localPath)) {
-                const data = fs.readFileSync(localPath, 'utf-8');
-                challenge = JSON.parse(data);
-                console.log('Challenge read from local storage:', challenge);
+            // Try reading from Redis cache first
+            const cachedData = await client.get(redisKey);
+            if (cachedData) {
+                challenge = JSON.parse(cachedData);
+                console.log('Challenge read from Redis cache:', challenge);
             }
 
-            // If no challenge is found in local storage or it doesn't match today's date, check the database
+            // If no challenge is found in Redis cache or it doesn't match today's date, check the database
             if (!challenge || challenge.date !== todayStr || challenge.theme !== theme) {
                 challenge = await Exercise.findOne({ date: todayStr, theme }).exec();
 
@@ -153,14 +152,14 @@ const controller = {
 
                 // If still no challenge is found, generate a new exercise
                 if (!challenge) {
-                    const recentExercises = await Exercise.find().sort({ date: -1 }).limit(5).exec(); // Get the last 5 exercises to avoid duplicates
+                    const recentExercises = await Exercise.find().sort({ date: -1 }).limit(5).exec();
                     challenge = await controller.generateExercise(today, theme, recentExercises);
                     await Exercise.insertMany([challenge]);
-                }
 
-                // Save the exercise to local storage
-                fs.writeFileSync(localPath, JSON.stringify(challenge, null, 2));
-                console.log('Challenge saved to local storage:', challenge);
+                    // Save the new exercise to Redis cache
+                    await client.set(redisKey, JSON.stringify(challenge), 'EX', 86400);
+                    console.log('New challenge generated and saved to Redis cache:', challenge);
+                }
             }
 
             return res?.status(200).json({ status: 'success', challenge: challenge.exercise });
