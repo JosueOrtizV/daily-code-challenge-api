@@ -8,7 +8,7 @@ const lusca = require('lusca');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const { RedisStore } = require('connect-redis'); 
+const { RedisStore } = require('connect-redis');
 const redisClient = require('./controllers/redisClient');
 const firebaseAdmin = require('firebase-admin');
 
@@ -65,10 +65,16 @@ app.use(cors({
     credentials: true,
 }));
 
-app.set('trust proxy', 1);
+app.set('trust proxy', 1); // Asegúrate de confiar en el primer proxy
+
+// Configurar lusca para la protección CSRF con secreto y cookie
+const csrfProtection = lusca.csrf({
+    secret: 'qwerty', // Secreto para CSRF
+    cookie: { name: '_csrf', httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'None' }
+});
 
 // Route to get CSRF token
-app.get('/api/csrf-token', lusca.csrf(), (req, res) => {
+app.get('/api/csrf-token', csrfProtection, (req, res) => {
     const csrfToken = res.locals._csrf;
     res.cookie('XSRF-TOKEN', csrfToken, {
         secure: process.env.NODE_ENV === 'production',
@@ -91,10 +97,12 @@ const exerciseRoutes = require('./routes/exercise');
 const userRoutes = require('./routes/user');
 const leaderboardRoutes = require('./routes/leaderboard');
 
+// Apply user routes
+app.use('/api/user', userRoutes);
+
 // Load other routes without CSRF protection
 app.use('/api', exerciseRoutes);
 app.use('/api', leaderboardRoutes);
-app.use('/api/user', userRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
