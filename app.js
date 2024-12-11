@@ -45,7 +45,7 @@ app.use(cors({
 }));
 
 // CSRF protection middleware
-const csrfProtection = csrf({ cookie: { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Lax' } });
+const csrfProtection = csurf({ cookie: { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'none' } });
 
 app.use((req, res, next) => {
     csrfProtection(req, res, next);
@@ -56,7 +56,7 @@ app.get('/api/csrf-token', csrfProtection, (req, res) => {
     res.cookie('XSRF-TOKEN', req.csrfToken(), {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: false,
-        sameSite: 'Lax'
+        sameSite: 'none'
     });
     
     res.status(200).json({ csrfToken: req.csrfToken() });
@@ -65,7 +65,7 @@ app.get('/api/csrf-token', csrfProtection, (req, res) => {
 // Rate limiting middleware to protect against brute force attacks
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 100 
+    max: 100
 });
 app.use(limiter);
 
