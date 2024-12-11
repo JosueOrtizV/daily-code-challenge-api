@@ -12,6 +12,8 @@ const router = express.Router();
 router.use((req, res, next) => {
     console.log('CSRF Header user:', req.headers['x-xsrf-token']);
     console.log('CSRF Cookie user:', req.cookies['_csrf']);
+    console.log('req',req);
+    
     next();
 });
 
