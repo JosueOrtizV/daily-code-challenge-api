@@ -9,7 +9,7 @@ const csurf = require('csurf');
 // CSRF protection middleware
 const csrfProtection = csurf({ 
     cookie: { 
-        httpOnly: true, 
+        httpOnly: false, 
         secure: process.env.NODE_ENV === 'production', 
         sameSite: 'None' 
     } 
