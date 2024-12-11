@@ -8,7 +8,7 @@ const lusca = require('lusca');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const RedisStore = require('connect-redis').default;
+const { RedisStore } = require('connect-redis'); 
 const redisClient = require('./controllers/redisClient');
 const firebaseAdmin = require('firebase-admin');
 
@@ -40,8 +40,13 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 // Configure session middleware (requerido para `lusca`)
+const redisStore = new RedisStore({
+    client: redisClient,
+    prefix: 'myapp:'
+});
+
 app.use(session({
-    store: new RedisStore({ client: redisClient }),
+    store: redisStore,
     secret: 'abc',
     resave: false,
     saveUninitialized: false,
