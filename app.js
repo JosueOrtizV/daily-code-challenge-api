@@ -47,7 +47,7 @@ app.use(cors({
 app.set('trust proxy', 1);
 
 // CSRF protection middleware
-const csrfProtection = csurf({ cookie: { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'None' } });
+const csrfProtection = csurf({ cookie: true });
 
 app.use((req, res, next) => {
     console.log('CSRF Header:', req.headers['x-xsrf-token']);
