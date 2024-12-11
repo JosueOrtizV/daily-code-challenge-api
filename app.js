@@ -49,15 +49,11 @@ app.set('trust proxy', 1);
 // CSRF protection middleware
 const csrfProtection = csurf({ cookie: { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Lax' } });
 
-// Registrar el contenido del token recibido para diagnóstico
 app.use((req, res, next) => {
     console.log('CSRF Header:', req.headers['x-xsrf-token']);
     console.log('CSRF Cookie:', req.cookies['XSRF-TOKEN']);
     next();
 });
-
-// Asegurarse de que el token no cambie en peticiones repetidas
-app.use(csrfProtection);
 
 // Route to get CSRF token
 app.get('/api/csrf-token', csrfProtection, (req, res) => {
@@ -72,8 +68,8 @@ app.get('/api/csrf-token', csrfProtection, (req, res) => {
 
 // Rate limiting middleware to protect against brute force attacks
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100 // limit each IP to 100 requests per windowMs
+    windowMs: 15 * 60 * 1000, 
+    max: 100
 });
 app.use(limiter);
 
