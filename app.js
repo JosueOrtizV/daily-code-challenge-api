@@ -44,15 +44,17 @@ app.use(cors({
     credentials: true,
 }));
 
-app.set('trust proxy', 1);
+app.set('trust proxy', 1); // Asegúrate de confiar en el primer proxy
 
 // CSRF protection middleware
 const csrfProtection = csurf({ cookie: true });
 
-// Registrar el contenido del token recibido para diagnóstico
+// Registrar el contenido del token recibido para diagnóstico solo en las rutas no específicas
 app.use((req, res, next) => {
-    console.log('CSRF Header:', req.headers['x-xsrf-token']);
-    console.log('CSRF Cookie:', req.cookies['XSRF-TOKEN']);
+    if (!req.path.startsWith('/api/user')) {
+        console.log('CSRF Header:', req.headers['x-xsrf-token']);
+        console.log('CSRF Cookie:', req.cookies['XSRF-TOKEN']);
+    }
     next();
 });
 

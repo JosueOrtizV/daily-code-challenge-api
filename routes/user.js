@@ -7,7 +7,14 @@ const verifyUser = require('../middleware/verifyUser');
 const csurf = require('csurf');
 
 // CSRF protection middleware
-const csrfProtection = csurf({ cookie: true });
+const csrfProtection = csurf({ 
+    cookie: { 
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === 'production', 
+        sameSite: 'None' 
+    } 
+});
+
 
 const router = express.Router();
 
@@ -19,7 +26,7 @@ router.use((req, res, next) => {
 });
 
 router.post('/checkUsernameAvailability', userController.checkUsernameAvailability);
-router.post('/saveOrUpdateUser', csrfProtection, userController.saveOrUpdateUser);
+router.post('/saveOrUpdateUser', verifyUser, csrfProtection, userController.saveOrUpdateUser);
 router.put('/updateUsername', verifyUser, csrfProtection, userController.updateUsername);
 router.get('/getUserData', verifyUser, csrfProtection, userController.getUserData);
 router.post('/contact', verifyUser, csrfProtection, contactController.contact);
