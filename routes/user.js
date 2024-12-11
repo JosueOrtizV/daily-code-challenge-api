@@ -13,13 +13,13 @@ const router = express.Router();
 
 // Registrar el contenido del token recibido para diagnóstico
 router.use((req, res, next) => {
-    console.log('CSRF Header:', req.headers['x-xsrf-token']);
-    console.log('CSRF Cookie:', req.cookies['XSRF-TOKEN']);
+    console.log('CSRF Header user:', req.headers['x-xsrf-token']);
+    console.log('CSRF Cookie user:', req.cookies['XSRF-TOKEN']);
     next();
 });
 
 router.post('/checkUsernameAvailability', userController.checkUsernameAvailability);
-router.post('/saveOrUpdateUser', csrfProtection, verifyUser, userController.saveOrUpdateUser);
+router.post('/saveOrUpdateUser', csrfProtection, userController.saveOrUpdateUser);
 router.put('/updateUsername', verifyUser, csrfProtection, userController.updateUsername);
 router.get('/getUserData', verifyUser, csrfProtection, userController.getUserData);
 router.post('/contact', verifyUser, csrfProtection, contactController.contact);
