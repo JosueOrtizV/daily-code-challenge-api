@@ -11,31 +11,29 @@ const router = express.Router();
 // Registrar el contenido del token recibido para diagnóstico
 router.use((req, res, next) => {
     console.log('CSRF Header user:', req.headers['x-xsrf-token']);
-    console.log('CSRF Cookie user:', req.cookies['_csrf']);
-    console.log('req',req);
-    
+    console.log('CSRF Cookie user:', req.cookies['XSRF-TOKEN']);
     next();
 });
 
 // Define las rutas con protección CSRF y registro de token
 router.post('/saveOrUpdateUser', verifyUser, lusca.csrf({
     secret: 'qwerty',
-    cookie: { name: '_csrf', httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'None' }
+    cookie: { name: 'XSRF-TOKEN', httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'None' }
 }), userController.saveOrUpdateUser);
 
 router.put('/updateUsername', verifyUser, lusca.csrf({
     secret: 'qwerty',
-    cookie: { name: '_csrf', httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'None' }
+    cookie: { name: 'XSRF-TOKEN', httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'None' }
 }), userController.updateUsername);
 
 router.get('/getUserData', verifyUser, lusca.csrf({
     secret: 'qwerty',
-    cookie: { name: '_csrf', httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'None' }
+    cookie: { name: 'XSRF-TOKEN', httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'None' }
 }), userController.getUserData);
 
 router.post('/contact', verifyUser, lusca.csrf({
     secret: 'qwerty',
-    cookie: { name: '_csrf', httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'None' }
+    cookie: { name: 'XSRF-TOKEN', httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'None' }
 }), contactController.contact);
 
 // Rutas sin protección CSRF
