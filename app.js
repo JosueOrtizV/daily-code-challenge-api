@@ -8,7 +8,7 @@ const lusca = require('lusca');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const RedisStore = require('connect-redis')(session);
+const RedisStore = require('connect-redis').default;
 const redisClient = require('./redisClient');
 const firebaseAdmin = require('firebase-admin');
 
