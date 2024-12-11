@@ -12,9 +12,9 @@ const csrfProtection = csurf({ cookie: true });
 const router = express.Router();
 
 // Registrar el contenido del token recibido para diagnóstico
-app.use((req, res, next) => {
-    console.log('CSRF Header user:', req.headers['x-xsrf-token']);
-    console.log('CSRF Cookie user:', req.cookies['XSRF-TOKEN']);
+router.use((req, res, next) => {
+    console.log('CSRF Header:', req.headers['x-xsrf-token']);
+    console.log('CSRF Cookie:', req.cookies['XSRF-TOKEN']);
     next();
 });
 
