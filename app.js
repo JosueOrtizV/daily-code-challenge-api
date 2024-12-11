@@ -8,6 +8,8 @@ const lusca = require('lusca');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const RedisStore = require('connect-redis')(session);
+const redisClient = require('./redisClient');
 const firebaseAdmin = require('firebase-admin');
 
 const app = express();
@@ -39,9 +41,10 @@ app.use(cookieParser());
 
 // Configure session middleware (requerido para `lusca`)
 app.use(session({
+    store: new RedisStore({ client: redisClient }),
     secret: 'abc',
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
     cookie: {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -83,10 +86,12 @@ const exerciseRoutes = require('./routes/exercise');
 const userRoutes = require('./routes/user');
 const leaderboardRoutes = require('./routes/leaderboard');
 
+// Apply user routes with CSRF protection
+app.use('/api/user', lusca.csrf(), userRoutes);
+
 // Load other routes without CSRF protection
 app.use('/api', exerciseRoutes);
 app.use('/api', leaderboardRoutes);
-app.use('/api/user', userRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

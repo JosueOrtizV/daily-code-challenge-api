@@ -17,10 +17,10 @@ router.use((req, res, next) => {
 
 // Define las rutas con protección CSRF y registro de token
 router.post('/checkUsernameAvailability', userController.checkUsernameAvailability);
-router.post('/saveOrUpdateUser', verifyUser, lusca.csrf(), userController.saveOrUpdateUser);
-router.put('/updateUsername', verifyUser, lusca.csrf(), userController.updateUsername);
-router.get('/getUserData', verifyUser, lusca.csrf(), userController.getUserData);
-router.post('/contact', verifyUser, lusca.csrf(), contactController.contact);
+router.post('/saveOrUpdateUser', lusca.csrf(), verifyUser, userController.saveOrUpdateUser); 
+router.put('/updateUsername', lusca.csrf(), verifyUser, userController.updateUsername); 
+router.get('/getUserData', lusca.csrf(), verifyUser, userController.getUserData); 
+router.post('/contact', lusca.csrf(), verifyUser, contactController.contact);
 router.post('/generateCustomToken', userController.createCustomToken);
 router.post('/checkUsernameAndUid', userController.checkUsernameAndUid);
 
