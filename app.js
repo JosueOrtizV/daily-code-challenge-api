@@ -76,7 +76,7 @@ app.use('/api', leaderboardRoutes);
 // Error handling middleware
 app.use((err, req, res, next) => {
     if (err.code === 'EBADCSRFTOKEN') {
-        res.status(403).json({ error: 'Invalid CSRF token' });
+        res.status(403).json({ error: `Invalid CSRF token${err}` });
     } else {
         res.status(500).json({ error: 'Something went wrong!' });
     }
