@@ -7,7 +7,7 @@ const verifyUser = require('../middleware/verifyUser');
 const csurf = require('csurf');
 
 // CSRF protection middleware
-const csrfProtection = csurf({ cookie: true });
+const csrfProtection = csurf({ cookie: { httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'None' } });
 
 const router = express.Router();
 
