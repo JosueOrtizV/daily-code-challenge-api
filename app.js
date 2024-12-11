@@ -9,7 +9,7 @@ const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const RedisStore = require('connect-redis').default;
-const redisClient = require('./redisClient');
+const redisClient = require('./controllers/redisClient');
 const firebaseAdmin = require('firebase-admin');
 
 const app = express();
