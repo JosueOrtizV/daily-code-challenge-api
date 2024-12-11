@@ -4,9 +4,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const helmet = require('helmet');
-const csurf = require('csurf');
+const lusca = require('lusca');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
 const firebaseAdmin = require('firebase-admin');
 
 const app = express();
@@ -36,6 +37,17 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+app.use(session({
+    secret: 'abc',
+    resave: true,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'None'
+    }
+}));
+
 // Configure CORS
 app.use(cors({
     origin: process.env.CLIENT_URL || 'https://dailycodechallenge.io',
@@ -44,29 +56,21 @@ app.use(cors({
     credentials: true,
 }));
 
-app.set('trust proxy', 1); // Asegúrate de confiar en el primer proxy
+app.set('trust proxy', 1);
 
-// CSRF protection middleware
-const csrfProtection = csurf({ 
-    cookie: {
-        key: 'XSRF-TOKEN',
-        path: '/',
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'None'
-    }
-});
-
-// Registrar el contenido del token recibido para diagnóstico
-app.use((req, res, next) => {
-    console.log('CSRF Header:', req.headers['x-xsrf-token']);
-    console.log('CSRF Cookie:', req.cookies['XSRF-TOKEN']);
-    next();
-});
+app.use(lusca({
+    csrf: true,
+    xframe: 'SAMEORIGIN',
+    p3p: 'ABCDEF',
+    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+    xssProtection: true,
+    nosniff: true,
+    referrerPolicy: 'same-origin'
+}));
 
 // Route to get CSRF token
-app.get('/api/csrf-token', csrfProtection, (req, res) => {
-    const csrfToken = req.csrfToken();
+app.get('/api/csrf-token', (req, res) => {
+    const csrfToken = res.locals._csrf;
     res.cookie('XSRF-TOKEN', csrfToken, {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: false,
@@ -94,11 +98,7 @@ app.use('/api', leaderboardRoutes);
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Error:', err);
-    if (err.code === 'EBADCSRFTOKEN') {
-        res.status(403).json({ error: 'Invalid CSRF token' });
-    } else {
-        res.status(500).json({ error: 'Something went wrong!' });
-    }
+    res.status(500).json({ error: 'Something went wrong!' });
 });
 
 module.exports = app;
