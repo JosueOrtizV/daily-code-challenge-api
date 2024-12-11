@@ -37,6 +37,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+// Configure session middleware (requerido para `lusca`)
 app.use(session({
     secret: 'abc',
     resave: true,
@@ -58,18 +59,8 @@ app.use(cors({
 
 app.set('trust proxy', 1);
 
-app.use(lusca({
-    csrf: true,
-    xframe: 'SAMEORIGIN',
-    p3p: 'ABCDEF',
-    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
-    xssProtection: true,
-    nosniff: true,
-    referrerPolicy: 'same-origin'
-}));
-
 // Route to get CSRF token
-app.get('/api/csrf-token', (req, res) => {
+app.get('/api/csrf-token', lusca.csrf(), (req, res) => {
     const csrfToken = res.locals._csrf;
     res.cookie('XSRF-TOKEN', csrfToken, {
         secure: process.env.NODE_ENV === 'production',
@@ -91,14 +82,20 @@ app.use(limiter);
 const exerciseRoutes = require('./routes/exercise');
 const userRoutes = require('./routes/user');
 const leaderboardRoutes = require('./routes/leaderboard');
+
+// Load other routes without CSRF protection
 app.use('/api', exerciseRoutes);
-app.use('/api/user', userRoutes);
 app.use('/api', leaderboardRoutes);
+app.use('/api/user', userRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Error:', err);
-    res.status(500).json({ error: 'Something went wrong!' });
+    if (err.code === 'EBADCSRFTOKEN') {
+        res.status(403).json({ error: 'Invalid CSRF token' });
+    } else {
+        res.status(500).json({ error: 'Something went wrong!' });
+    }
 });
 
 module.exports = app;
