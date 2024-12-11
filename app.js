@@ -65,11 +65,10 @@ app.use(cors({
     credentials: true,
 }));
 
-app.set('trust proxy', 1); // Asegúrate de confiar en el primer proxy
+app.set('trust proxy', 1); 
 
-// Configurar lusca para la protección CSRF con secreto, cookie y angular: true
 const csrfProtection = lusca.csrf({
-    secret: 'qwerty', // Secreto para CSRF
+    secret: 'qwerty', 
     cookie: { name: 'XSRF-TOKEN', httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'None' },
     angular: true
 });
@@ -101,7 +100,7 @@ const leaderboardRoutes = require('./routes/leaderboard');
 // Apply user routes
 app.use('/api/user', userRoutes);
 
-// Load other routes without CSRF protection
+// Load other routes
 app.use('/api', exerciseRoutes);
 app.use('/api', leaderboardRoutes);
 

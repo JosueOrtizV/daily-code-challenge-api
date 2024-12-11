@@ -8,15 +8,6 @@ const lusca = require('lusca');
 
 const router = express.Router();
 
-// Registrar el contenido del token recibido para diagnóstico
-router.use((req, res, next) => {
-    console.log('CSRF Header user:', req.headers['x-xsrf-token']);
-    console.log('CSRF Cookie user:', req.cookies['XSRF-TOKEN']);
-    console.log('CSRF Cookie user:', req.cookies);
-    next();
-});
-
-// Define las rutas con protección CSRF y registro de token
 router.post('/saveOrUpdateUser', verifyUser, lusca.csrf({
     secret: 'qwerty',
     cookie: { name: 'XSRF-TOKEN', httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'None' },
