@@ -45,7 +45,7 @@ app.use(cors({
 }));
 
 // CSRF protection middleware
-const csrfProtection = csurf({ cookie: { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'None' } });
+const csrfProtection = csurf({ cookie: true });
 
 // Route to get CSRF token
 app.get('/api/csrf-token', csrfProtection, (req, res) => {
