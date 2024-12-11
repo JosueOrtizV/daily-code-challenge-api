@@ -67,10 +67,11 @@ app.use(cors({
 
 app.set('trust proxy', 1); // Asegúrate de confiar en el primer proxy
 
-// Configurar lusca para la protección CSRF con secreto y cookie
+// Configurar lusca para la protección CSRF con secreto, cookie y angular: true
 const csrfProtection = lusca.csrf({
-    secret: 'qwerty',
-    cookie: { name: 'XSRF-TOKEN', httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'None' }
+    secret: 'qwerty', // Secreto para CSRF
+    cookie: { name: 'XSRF-TOKEN', httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'None' },
+    angular: true
 });
 
 // Route to get CSRF token
@@ -87,7 +88,7 @@ app.get('/api/csrf-token', csrfProtection, (req, res) => {
 
 // Rate limiting middleware to protect against brute force attacks
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
+    windowMs: 15 * 60 * 1000, 
     max: 100
 });
 app.use(limiter);
