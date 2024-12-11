@@ -47,12 +47,16 @@ app.use(cors({
 // CSRF protection middleware
 const csrfProtection = csurf({ cookie: true });
 
+app.use((req, res, next) => {
+    csrfProtection(req, res, next);
+});
+
 // Route to get CSRF token
 app.get('/api/csrf-token', csrfProtection, (req, res) => {
     res.cookie('XSRF-TOKEN', req.csrfToken(), {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: false,
-        sameSite: 'Strict'
+        sameSite: 'Lax'
     });
     
     res.status(200).json({ csrfToken: req.csrfToken() });
@@ -60,8 +64,8 @@ app.get('/api/csrf-token', csrfProtection, (req, res) => {
 
 // Rate limiting middleware to protect against brute force attacks
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100 // limit each IP to 100 requests per windowMs
+    windowMs: 15 * 60 * 1000,
+    max: 100 
 });
 app.use(limiter);
 
