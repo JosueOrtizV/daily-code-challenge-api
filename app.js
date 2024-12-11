@@ -69,7 +69,7 @@ app.set('trust proxy', 1); // Asegúrate de confiar en el primer proxy
 
 // Configurar lusca para la protección CSRF con secreto y cookie
 const csrfProtection = lusca.csrf({
-    secret: 'qwerty', // Secreto para CSRF
+    secret: 'qwerty',
     cookie: { name: 'XSRF-TOKEN', httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'None' }
 });
 
