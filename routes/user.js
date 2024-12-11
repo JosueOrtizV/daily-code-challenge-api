@@ -11,7 +11,7 @@ const csrfProtection = csurf({ cookie: true });
 
 const router = express.Router();
 
-router.post('/checkUsernameAvailability', csrfProtection, userController.checkUsernameAvailability);
+router.post('/checkUsernameAvailability', userController.checkUsernameAvailability);
 router.post('/saveOrUpdateUser', verifyUser, csrfProtection, userController.saveOrUpdateUser);
 router.put('/updateUsername', verifyUser, csrfProtection, userController.updateUsername);
 router.get('/getUserData', verifyUser, csrfProtection, userController.getUserData);
