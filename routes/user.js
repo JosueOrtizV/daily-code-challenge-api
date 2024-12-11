@@ -8,13 +8,14 @@ const csurf = require('csurf');
 
 // CSRF protection middleware
 const csrfProtection = csurf({ 
-    cookie: { 
-        httpOnly: false, 
-        secure: process.env.NODE_ENV === 'production', 
-        sameSite: 'None' 
-    } 
+    cookie: {
+        key: 'XSRF-TOKEN',
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'None'
+    }
 });
-
 
 const router = express.Router();
 
@@ -25,6 +26,7 @@ router.use((req, res, next) => {
     next();
 });
 
+// Define las rutas con protección CSRF y registro de token
 router.post('/checkUsernameAvailability', userController.checkUsernameAvailability);
 router.post('/saveOrUpdateUser', verifyUser, csrfProtection, userController.saveOrUpdateUser);
 router.put('/updateUsername', verifyUser, csrfProtection, userController.updateUsername);

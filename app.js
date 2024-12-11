@@ -40,21 +40,27 @@ app.use(cookieParser());
 app.use(cors({
     origin: process.env.CLIENT_URL || 'https://dailycodechallenge.io',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-XSRF-TOKEN', 'username'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-XSRF-TOKEN'],
     credentials: true,
 }));
 
 app.set('trust proxy', 1); // Asegúrate de confiar en el primer proxy
 
 // CSRF protection middleware
-const csrfProtection = csurf({ cookie: true });
-
-// Registrar el contenido del token recibido para diagnóstico solo en las rutas no específicas
-app.use((req, res, next) => {
-    if (!req.path.startsWith('/api/user')) {
-        console.log('CSRF Header:', req.headers['x-xsrf-token']);
-        console.log('CSRF Cookie:', req.cookies['XSRF-TOKEN']);
+const csrfProtection = csurf({ 
+    cookie: {
+        key: 'XSRF-TOKEN',
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'None'
     }
+});
+
+// Registrar el contenido del token recibido para diagnóstico
+app.use((req, res, next) => {
+    console.log('CSRF Header:', req.headers['x-xsrf-token']);
+    console.log('CSRF Cookie:', req.cookies['XSRF-TOKEN']);
     next();
 });
 
