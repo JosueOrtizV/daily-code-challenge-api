@@ -15,7 +15,7 @@ router.post('/checkUsernameAvailability', userController.checkUsernameAvailabili
 router.post('/saveOrUpdateUser', verifyUser, csrfProtection, userController.saveOrUpdateUser);
 router.put('/updateUsername', verifyUser, csrfProtection, userController.updateUsername);
 router.get('/getUserData', verifyUser, csrfProtection, userController.getUserData);
-router.post('/contact', verifyUser, contactController.contact);
+router.post('/contact', verifyUser, csrfProtection, contactController.contact);
 router.post('/generateCustomToken', userController.createCustomToken);
 router.post('/checkUsernameAndUid', userController.checkUsernameAndUid);
 

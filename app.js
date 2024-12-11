@@ -49,6 +49,7 @@ app.set('trust proxy', 1);
 // CSRF protection middleware
 const csrfProtection = csurf({ cookie: true });
 
+// Registrar el contenido del token recibido para diagnóstico
 app.use((req, res, next) => {
     console.log('CSRF Header:', req.headers['x-xsrf-token']);
     console.log('CSRF Cookie:', req.cookies['XSRF-TOKEN']);
@@ -66,7 +67,6 @@ app.get('/api/csrf-token', csrfProtection, (req, res) => {
     console.log('CSRF token generated and sent:', csrfToken);
     res.status(200).json({ csrfToken });
 });
-
 
 // Rate limiting middleware to protect against brute force attacks
 const limiter = rateLimit({
