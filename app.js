@@ -60,9 +60,9 @@ app.get('/api/csrf-token', csrfProtection, (req, res) => {
     res.cookie('XSRF-TOKEN', req.csrfToken(), {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: false,
-        sameSite: 'None'
+        sameSite: 'Lax'
     });
-    
+    console.log('CSRF token generated and sent:', csrfToken);
     res.status(200).json({ csrfToken: req.csrfToken() });
 });
 
@@ -83,6 +83,7 @@ app.use('/api', leaderboardRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
+    console.error('Error:', err);
     if (err.code === 'EBADCSRFTOKEN') {
         res.status(403).json({ error: 'Invalid CSRF token' });
     } else {
