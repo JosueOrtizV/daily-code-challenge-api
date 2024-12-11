@@ -91,12 +91,10 @@ const exerciseRoutes = require('./routes/exercise');
 const userRoutes = require('./routes/user');
 const leaderboardRoutes = require('./routes/leaderboard');
 
-// Apply user routes with CSRF protection
-app.use('/api/user', lusca.csrf(), userRoutes);
-
 // Load other routes without CSRF protection
 app.use('/api', exerciseRoutes);
 app.use('/api', leaderboardRoutes);
+app.use('/api/user', userRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
