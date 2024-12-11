@@ -54,6 +54,8 @@ app.get('/api/csrf-token', csrfProtection, (req, res) => {
         httpOnly: false,
         sameSite: 'Strict'
     });
+    console.log('csrfToken:', req.csrfToken());
+    
     res.status(200).json({ csrfToken: req.csrfToken() });
 });
 
